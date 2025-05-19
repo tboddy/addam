@@ -143,7 +143,6 @@ static void updateEnemy(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &smallBullet,
 			.anim = 4,
 			.speed = FIX16(2 + (random() % 2 < 1 ? 0.5 : 0)),
 			.angle = random() % 1024

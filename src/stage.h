@@ -430,8 +430,9 @@ void loadStage(){
 
 
 static void stageOne(){
-	// if(enemyCount < 3 && stageClock % 20 == 0 && timeLeft > 0 && stageClock > 20) spawnEnemy(25);
-	if(enemyCount < 3 && stageClock % 20 == 0 && timeLeft > 0 && stageClock > 20) spawnEnemy(1);
+	if(stageClock == 0) XGM_stopPlay();
+	else if(stageClock == 40) spawnEnemy(23);
+	// if(enemyCount < 3 && stageClock % 20 == 0 && timeLeft > 0 && stageClock > 20) spawnEnemy(1);
 }
 static void stageTwo(){
 	if(enemyCount < 3 && stageClock % 20 == 0 && timeLeft > 0 && stageClock > 20) spawnEnemy(2);

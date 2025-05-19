@@ -41,10 +41,12 @@ IMAGE lockX "map/lockx.png" NONE NONE
 IMAGE lockY "map/locky.png" NONE NONE
 
 // bullet
-SPRITE smallBullet "bullets/small.png" 1 1 NONE 4
-SPRITE bigBullet "bullets/big.png" 2 2 NONE 4
-SPRITE hugeBullet "bullets/huge.png" 4 4 NONE 4
-SPRITE playerBullet "bullets/player.png" 2 2 NONE 4
+// SPRITE smallBullet "bullets/small.png" 1 1 NONE 4
+// SPRITE bigBullet "bullets/big.png" 2 2 NONE 4
+// SPRITE hugeBullet "bullets/huge.png" 4 4 NONE 4
+// SPRITE playerBullet "bullets/player.png" 2 2 NONE 4
+
+SPRITE bulletsSprite "bullets.png" 2 2 NONE 0
 
 
 SPRITE allExplosions "explosions.png" 4 4 NONE 0

@@ -67,28 +67,25 @@ static void updateEnemyTwo(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
-			.anim = 0,
+			.anim = 2,
+			.speed = FIX16(3)
 		};
-		spawner.vel = hone(enemies[i].pos, player.pos, FIX16(3), 0);
+		spawner.angle = honeAngle(enemies[i].pos.x, player.pos.x, enemies[i].pos.y, player.pos.y);
 		spawnBullet(spawner, EMPTY);
 		bulletSfx(1);
-	} else if(enemies[i].clock % 120 >= 30 && enemies[i].clock % 120 < (isLunatic ? 35 : 33)){
-		if(enemies[i].clock % 120 == 30){
-			enemies[i].ints[0] = random() % 341;
-			bulletSfx(2);
-		}
+	} else if(enemies[i].clock % 120 == 30){
+		bulletSfx(2);
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &smallBullet,
-			.anim = 2,
+			.anim = 0,
 			.speed = FIX16(2),
-			.angle = enemies[i].ints[0]
+			.angle = random() % 205,
 		};
-		spawnBullet(spawner, EMPTY);
-		enemies[i].ints[0] += (isLunatic ? 205 : 341);
+		for(u8 j = 0; j < (isLunatic ? 5 : 3); j++){
+			spawnBullet(spawner, EMPTY);
+			spawner.angle += isLunatic ? 205 : 341;
+		}
 	}
 }
 
@@ -103,10 +100,10 @@ static void spawnEnemyThree(s16 i){
 		TILE_ATTR(gameOver ? PAL1 : PAL0, 0, FALSE, FALSE));
 	setEnemySpeed(i);
 	enemies[i].ints[5] = (random() % 30) + 30;
-	enemies[i].ints[6] = enemies[i].ints[5] + 8;
+	enemies[i].ints[6] = enemies[i].ints[5] + 1;
 }
 static void updateEnemyThree(s16 i){
-	if(enemies[i].clock % 60 >= enemies[i].ints[5] && enemies[i].clock % 60 < enemies[i].ints[6]){
+	if(enemies[i].clock % 60 == enemies[i].ints[5] || enemies[i].clock % 60 == enemies[i].ints[6]){
 		if(enemies[i].clock % 60 == enemies[i].ints[5]){
 			enemies[i].ints[0] = random() % 1024;
 			bulletSfx(1);
@@ -114,13 +111,15 @@ static void updateEnemyThree(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &smallBullet,
 			.anim = 0,
 			.speed = FIX16(2),
 			.angle = enemies[i].ints[0]
 		};
-		spawnBullet(spawner, EMPTY);
-		enemies[i].ints[0] += 128;
+		for(u8 j = 0; j < 4; j++){
+			spawnBullet(spawner, EMPTY);
+			spawner.angle += 128;
+		}
+		enemies[i].ints[0] += 512;
 	}
 }
 
@@ -143,11 +142,10 @@ static void updateEnemyFour(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = enemies[i].clock % 8 == 4 ? &bigBullet : &smallBullet,
-			.big = enemies[i].clock % 8 == 4,
-			.anim = 1
+			.angle = honeAngle(enemies[i].pos.x, player.pos.x, enemies[i].pos.y, player.pos.y) - (enemies[i].clock % 40 == 20 ? 0 : (40 + (random() % 80))),
+			.speed = FIX16(2 + (enemies[i].clock % 8 == 0 ? 0 : 1)),
+			.anim = enemies[i].clock % 8 == 4 ? 2 : 0
 		};
-		spawner.vel = hone(enemies[i].pos, player.pos, FIX16(2) + (enemies[i].clock % 8 == 0 ? 0 : 1), enemies[i].clock % 40 == 20 ? 0 : 80);
 		spawnBullet(spawner, EMPTY);
 	}
 }
@@ -166,25 +164,18 @@ static void spawnEnemyFive(s16 i){
 static void updateEnemyFive(s16 i){
 	if(enemies[i].clock % 40 >= 25 && enemies[i].clock % 5 == 0){
 		if(enemies[i].clock % 40 == 25)  enemies[i].fixes[0] = 0;
-		if(enemies[i].clock % 10 == 5){
-			bulletSfx(1);
-		}
+		if(enemies[i].clock % 10 == 5) bulletSfx(1);
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
-			.anim = 2
+			.anim = 4,
+			.speed = FIX16(3) - enemies[i].fixes[0],
+			.angle = honeAngle(enemies[i].pos.x, player.pos.x, enemies[i].pos.y, player.pos.y)
 		};
-		spawner.vel = hone(enemies[i].pos, player.pos, FIX16(3) - enemies[i].fixes[0], 0);
 		spawnBullet(spawner, EMPTY);
 		enemies[i].fixes[0] += FIX16(0.2);
 	}
 }
-
-
-
-
 
 static void spawnEnemySix(s16 i){
 	enemies[i].health = 2;
@@ -211,10 +202,9 @@ static void updateEnemySix(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &smallBullet,
-			.anim = 2,
 			.speed = enemies[i].fixes[0],
-			.angle = enemies[i].ints[0]
+			.angle = enemies[i].ints[0],
+			.anim = 0
 		};
 		spawnBullet(spawner, EMPTY);
 		enemies[i].ints[0] += 128;
@@ -233,31 +223,27 @@ static void spawnEnemySeven(s16 i){
 	setEnemySpeed(i);
 }
 static void updateEnemySeven(s16 i){
-	if(
-		(enemies[i].clock % 40 >= 10 && enemies[i].clock % 40 < 15) ||
-		(enemies[i].clock % 40 >= 20 && enemies[i].clock % 40 < 25) ||
-		(enemies[i].clock % 40 >= 30 && enemies[i].clock % 40 < 35)
-		){
-		if(enemies[i].clock % 40 == 10 || enemies[i].clock % 40 == 15 || enemies[i].clock % 40 == 30) bulletSfx(2);
+	if((enemies[i].clock % 40 == 10) || (enemies[i].clock % 40 == 20) || (enemies[i].clock % 40 == 30)){
+		bulletSfx(2);
 		if(enemies[i].clock % 40 == 10){
 			enemies[i].ints[0] = random() % 1024;
 			enemies[i].fixes[0] = FIX16(3);
-		}
-		if(enemies[i].clock % 40 == 20 || enemies[i].clock % 40 == 30){
+		} else if(enemies[i].clock % 40 == 20 || enemies[i].clock % 40 == 30){
 			enemies[i].ints[0] += 64;
 			enemies[i].fixes[0] -= FIX16(0.5);
 		}
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
-			.anim = 1,
+			.anim = enemies[i].clock % 40 == 20 ? 4 : 1,
 			.speed = enemies[i].fixes[0],
 			.angle = enemies[i].ints[0]
 		};
-		spawnBullet(spawner, EMPTY);
-		enemies[i].ints[0] += 205;
+		// big true
+		for(u8 j = 0; j < 5; j++){
+			spawnBullet(spawner, EMPTY);
+			spawner.angle += 205;
+		}
 	}
 }
 
@@ -266,7 +252,7 @@ static void updateEnemySeven(s16 i){
 
 // lily from touhou 7
 static void spawnBossOne(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss1);
+	// if(!isAttract) XGM_startPlay(&bgmBoss1);
 	if(isAttract) enemies[i].angle = 768 - 64;
 	enemies[i].health = 15;
 	enemies[i].off.x = 16;
@@ -284,74 +270,51 @@ static void spawnBossOne(s16 i){
 
 static void updateBossOne(s16 i){
 	bossHealth = enemies[i].health;
-	if(enemies[i].clock % 240 < 180){
-		if(enemies[i].clock >= 60 && ((enemies[i].clock % 60 >= 0 && enemies[i].clock % 60 < 5))){
-			if(enemies[i].clock % 60 == 0){
-				bulletSfx(1);
+	if(enemies[i].clock % 300 < 200){
+		if(enemies[i].clock % 50 == 30 ||
+			enemies[i].clock % 50 == 35 ||
+			enemies[i].clock % 50 == 40){
+			if(enemies[i].clock % 50 == 30){
 				enemies[i].ints[0] = random() % 1024;
-				enemies[i].fixes[0] = enemies[i].pos.x;
-				enemies[i].fixes[1] = enemies[i].pos.y;
 			}
 			struct bulletSpawner spawner = {
-				.x = enemies[i].fixes[0],
-				.y = enemies[i].fixes[1],
-				.image = &bigBullet,
-				.big = TRUE,
+				.x = enemies[i].pos.x,
+				.y = enemies[i].pos.y,
 				.anim = 0,
-				.speed = FIX16(2),
+				.speed = FIX16(3),
 				.angle = enemies[i].ints[0]
 			};
 			void updater(s16 j){
-				if(!bullets[j].bools[0] && bullets[j].clock > 0 && bullets[j].clock % 8 == 0){
-					bullets[j].speed -= FIX16(0.5);
+				if(bullets[j].clock % 5 == 0 && bullets[j].speed > 0 && !bullets[j].bools[1]){
+					bullets[j].speed -= FIX16(1);
+					if(bullets[j].speed == 0) bullets[j].bools[1] = TRUE;
 					updateBulletVel(j);
-					if(bullets[j].speed <= 0) bullets[j].bools[0] = TRUE;
-				} else if(bullets[j].clock == 45){
-					bullets[j].vel = hone(bullets[j].pos, player.pos, FIX16(3), 0);
-				}
-			}
-			spawnBullet(spawner, updater);
-			enemies[i].ints[0] += 205;
-		} else if(
-			(enemies[i].clock % 60 >= 30 && enemies[i].clock % 60 < 35) ||
-			(enemies[i].clock % 60 >= 40 && enemies[i].clock % 60 < 45)
-			){
-			if(enemies[i].clock % 60 == 30){
-				enemies[i].ints[0] = random() % 1024;
-				enemies[i].fixes[0] = enemies[i].pos.x;
-				enemies[i].fixes[1] = enemies[i].pos.y;
-			}
-			if(enemies[i].clock % 60 == 30 || enemies[i].clock % 60 == 40)
-				bulletSfx(2);
-			struct bulletSpawner spawner = {
-				.x = enemies[i].fixes[0],
-				.y = enemies[i].fixes[1],
-				.image = &bigBullet,
-				.big = TRUE,
-				.anim = 2,
-				.speed = FIX16(2),
-				.angle = enemies[i].ints[0]
-			};
-			void updater(s16 j){
-				if(!bullets[j].bools[0] && bullets[j].clock > 0 && bullets[j].clock % 8 == 0){
-					bullets[j].speed -= FIX16(0.5);
-					updateBulletVel(j);
-					if(bullets[j].speed <= 0) bullets[j].bools[0] = TRUE;
-				} else if(bullets[j].clock == 45){
-					bullets[j].angle += 128;
+				} else if(bullets[j].clock == 30){
 					bullets[j].speed = FIX16(3);
+					if(bullets[j].bools[0]) bullets[j].angle = honeAngle(bullets[j].pos.x, player.pos.x, bullets[j].pos.y, player.pos.y);
+					else bullets[j].angle += 512;
 					updateBulletVel(j);
 				}
 			}
-			spawnBullet(spawner, updater);
-			enemies[i].ints[0] += 205;
-
+			for(u8 j = 0; j < 4; j++){
+				spawner.bools[0] = j % 2 == 0;
+				spawner.anim = j % 2 == 0 ? 5 : 0;
+				spawnBullet(spawner, updater);
+				spawner.angle += 256;
+			}
+			enemies[i].ints[0] += (enemies[i].clock % 50 == 35 ? 41 : -41);
 		}
+	} else if(enemies[i].clock % 3 == 0 && enemies[i].clock % 300 >= 220 && enemies[i].clock % 300 < 280){
+		struct bulletSpawner spawner = {
+			.x = enemies[i].pos.x,
+			.y = enemies[i].pos.y,
+			.anim = 2,
+			.speed = FIX16(enemies[i].clock % 6 == 0 ? 2 : 3),
+			.angle = random() % 1024
+		};
+		spawnBullet(spawner, EMPTY);
 	}
 }
-
-
-// second
 
 // cirno from touhou 7
 static void spawnBossTwo(s16 i){
@@ -375,15 +338,16 @@ static void updateBossTwo(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
 			.anim = 2,
 		};
+		// big true
 		if(enemies[i].clock % 20 == 0){
 			bulletSfx(1);
-			spawner.vel = hone(enemies[i].pos, player.pos, FIX16(2), 0);
+			spawner.speed = FIX16(2);
+			spawner.angle = honeAngle(enemies[i].pos.x, player.pos.x, enemies[i].pos.y, player.pos.y);
 		} else {
-			spawner.vel = hone(enemies[i].pos, player.pos, FIX16(1.5), 64);
+			spawner.speed = FIX16(1.5);
+			spawner.angle = honeAngle(enemies[i].pos.x, player.pos.x, enemies[i].pos.y, player.pos.y) - 32 + (random() % 64);
 		}
 		spawnBullet(spawner, EMPTY);
 	}
@@ -398,12 +362,11 @@ static void updateBossTwo(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
-			.anim = 2,
+			.anim = 5,
 			.speed = FIX16(4),
 			.angle = enemies[i].clock % 4 == 0 ? enemies[i].ints[0] : enemies[i].ints[1]
 		};
+		// big true
 		spawner.bools[0] = enemies[i].clock % 2 == 0;
 		void updater(s16 j){
 			if(bullets[j].clock == 5){
@@ -424,8 +387,6 @@ static void updateBossTwo(s16 i){
 	}
 }
 
-
-// third
 
 // eternity from touhou 16, normal spell
 static void spawnBossThree(s16 i){
@@ -463,12 +424,11 @@ static void updateBossThree(s16 i){
 			struct bulletSpawner spawner = {
 				.x = enemies[i].fixes[1],
 				.y = enemies[i].fixes[2],
-				.image = &bigBullet,
-				.big = TRUE,
 				.anim = 0,
 				.speed = FIX16(3.5) - enemies[i].fixes[0],
 				.angle = enemies[i].ints[0]
 			};
+			// big true
 			spawnBullet(spawner, EMPTY);
 			enemies[i].ints[0] += 256;
 		}
@@ -484,12 +444,11 @@ static void updateBossThree(s16 i){
 				struct bulletSpawner spawner = {
 					.x = enemies[i].fixes[1],
 					.y = enemies[i].fixes[2],
-					.image = &bigBullet,
 					.anim = 1,
-					.big = TRUE,
 					.speed = FIX16(2),
 					.angle = enemies[i].ints[2]
 				};
+				// big true
 				spawner.bools[0] = enemies[i].clock % 6 == 0;
 				void updater(s16 j){
 					if(!bullets[j].bools[1] && bullets[j].clock % 5 == 0){
@@ -507,16 +466,14 @@ static void updateBossThree(s16 i){
 				spawnBullet(spawner, updater);
 				enemies[i].ints[2] += 158;
 			} else if(enemies[i].clock % 240 >= 120 && enemies[i].clock % 2 == 0) {
-
 					struct bulletSpawner spawner = {
 						.x = enemies[i].fixes[1],
 						.y = enemies[i].fixes[2],
-						.image = &hugeBullet,
-						.huge = TRUE,
 						.anim = 1,
 						.speed = FIX16(2.5),
 						.angle = enemies[i].ints[2]
 					};
+					// big true
 					spawnBullet(spawner, EMPTY);
 					enemies[i].ints[2] += 158;
 
@@ -526,8 +483,6 @@ static void updateBossThree(s16 i){
 	}
 }
 
-
-// fourth
 
 // sunny from gfw, spell 1
 static void spawnBossFour(s16 i){
@@ -556,18 +511,15 @@ static void updateBossFour(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.anim = 0,
-			.big = TRUE,
+			.anim = 5,
 			.speed = FIX16(enemies[i].clock % 4 == 0 ? 2.5 : 3),
 			.angle = enemies[i].ints[0]
 		};
+		spawner.angle = spawner.angle % 1024;
 		spawnBullet(spawner, EMPTY);
 		enemies[i].ints[0] += 210;
 		if(enemies[i].clock % 120 >= 60 && enemies[i].clock % 4 == 0){
-			spawner.anim = 2;
-			spawner.huge = TRUE;
-			spawner.image = &hugeBullet;
+			spawner.anim = 1;
 			spawner.speed = FIX16(2);
 			spawner.angle = enemies[i].ints[1];
 			spawnBullet(spawner, EMPTY);
@@ -576,8 +528,6 @@ static void updateBossFour(s16 i){
 	}
 }
 
-
-// fifth
 
 // luna from gfw, spells 2, 3
 static void spawnBossFive(s16 i){
@@ -602,9 +552,7 @@ static void updateBossFive(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.anim = 0,
-			.big = TRUE,
+			.anim = enemies[i].clock % 6 == 0 ? 1 : 2,
 			.speed = FIX16(enemies[i].clock % 6 == 0 ? 2 : 3),
 			.angle = random() % 1024
 		};
@@ -620,7 +568,6 @@ static void updateBossFive(s16 i){
 			if(enemies[i].clock  % 6 == 0){
 				spawner.big = FALSE;
 				spawner.huge = TRUE;
-				spawner.image = &hugeBullet;
 			}
 			spawnBullet(spawner, EMPTY);
 			enemies[i].ints[1] += 633;
@@ -628,8 +575,6 @@ static void updateBossFive(s16 i){
 	}
 }
 
-
-// sixth
 
 // star from gfw, spells 2, 3
 static void spawnBossSix(s16 i){
@@ -654,12 +599,11 @@ static void updateBossSix(s16 i){
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &hugeBullet,
-			.huge = TRUE,
 			.anim = 2,
 			.speed = FIX16(enemies[i].clock % 2 == 0 ? 3 : 2),
-			.angle = random() % 1024
+			.angle = random() % 512
 		};
+		// huge true
 		void updater(s16 j){
 			if(bullets[j].clock == 25){
 				bullets[j].vel.x = 0;
@@ -671,21 +615,21 @@ static void updateBossSix(s16 i){
 					struct bulletSpawner spawner = {
 						.x = bullets[j].pos.x,
 						.y = bullets[j].pos.y,
-						.image = &bigBullet,
-						.big = TRUE,
-						.anim = 2
+						.anim = 4,
+						.speed = FIX16(bullets[j].clock % 20 == 0 ? 3 : 4),
+						.angle = honeAngle(bullets[j].pos.x, player.pos.x, bullets[j].pos.y, player.pos.y) - 40 + (random() % 80)
 					};
-					spawner.vel = hone(bullets[j].pos, player.pos, FIX16(bullets[j].clock % 20 == 0 ? 3 : 4), 88);
 					spawnBullet(spawner, EMPTY);
 				}
 			}
 		}
-		spawnBullet(spawner, updater);
+		for(u8 j = 0; j < 2; j++){
+			spawnBullet(spawner, updater);
+			spawner.angle += 512;
+		}
 	}
 }
 
-
-// final
 
 // clownpiece from touhou 15, non, spells 2, 3
 static void spawnBossFinal(s16 i){
@@ -705,24 +649,21 @@ static void spawnBossFinal(s16 i){
 }
 static void updateBossFinal(s16 i){
 	bossHealth = enemies[i].health;
-	if(enemies[i].clock % 120 >= 30 && enemies[i].clock % 3 == 0){
+	if(enemies[i].clock % 120 >= 30 && enemies[i].clock % 2 == 0){
 		if(enemies[i].clock % 120 == 30){
 			enemies[i].ints[0] = random() % 1024;
 		}
-		if(enemies[i].clock % 9 == 0) bulletSfx(1);
+		if(enemies[i].clock % 4 == 0) bulletSfx(1);
 		struct bulletSpawner spawner = {
 			.x = enemies[i].pos.x,
 			.y = enemies[i].pos.y,
-			.image = &bigBullet,
-			.big = TRUE,
-			.anim = 2,
+			.anim = 1,
 			.speed = FIX16(3),
 			.angle = enemies[i].ints[0]
 		};
-		if(enemies[i].clock % 15 == 0 && enemies[i].clock > 0){
-			spawner.big = FALSE;
-			spawner.huge = TRUE;
-			spawner.image = &hugeBullet;
+		// big true
+		if(enemies[i].clock % 6 == 0 && enemies[i].clock > 0){
+			spawner.anim = 0;
 			spawner.bools[5] = TRUE;
 			spawner.x += fix16Mul(cosFix16(spawner.angle), FIX16(8));
 			spawner.y += fix16Mul(sinFix16(spawner.angle), FIX16(8));

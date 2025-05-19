@@ -49,6 +49,7 @@ void EMPTY(s16 i){emptyI = i;}
 #define SFX_GAME_OVER 80
 #define SFX_BEAT_GAME 81
 
+#define FIRST_ROTATING_BULLET 3
 
 bool gameOver, isAttract, paused, started, unlocked, wonGame, pausing,
 	isLunatic, isClassic, xgm2Active;
@@ -123,7 +124,7 @@ void updateControls(u16 joy, u16 changed, u16 state){
 
 // player
 
-#define INVINCIBLE_LIMIT 60 * 3
+#define INVINCIBLE_LIMIT 120
 
 struct playerStruct {
 	bool movingLeft, movingUp, flipping, sideFlipped, startedFlip, canFlip,
@@ -142,7 +143,7 @@ struct playerStruct player;
 // bullets
 
 #define KILL_BULLET_TIME 15
-#define BULLET_COUNT 64
+#define BULLET_COUNT 72
 bool killBullets;
 s16 playerBulletCount, bulletCount;
 
@@ -151,17 +152,17 @@ struct bulletSpawner {
 	Vect2D_f16 vel;
 	s16 angle, anim;
 	SpriteDefinition* image;
-	bool big, player, huge, top, xFlip, yFlip;
+	bool big, player, huge, top, hFlip, vFlip;
 	bool bools[COUNT_INT];
 	s16 ints[COUNT_INT];
 	fix16 fixes[COUNT_INT];
 };
 struct bullet {
-	bool active, player, big, huge;
+	bool active, player, big, huge, hFlip, vFlip;
 	Vect2D_s16 posTile;
 	fix16 speed;
 	Vect2D_f16 pos, vel;
-	s16 angle, clock, anim;
+	s16 angle, clock, anim, frame;
 	fix32 dist;
 	Sprite* image;
 	void (*updater)(s16);
@@ -197,7 +198,7 @@ struct enemy enemies[ENEMY_COUNT];
 
 // explosions
 
-#define EXPLOSION_COUNT 2
+#define EXPLOSION_COUNT 4
 bool killExplosions;
 
 struct explosion {
@@ -225,6 +226,33 @@ Vect2D_f16 hone(Vect2D_f16 pos, Vect2D_f16 target, fix16 speed, s16 lerp){
 	hPos.x = fix16Mul(fix16Div(hPos.x - pos.x, hMod), speed);
 	hPos.y = fix16Mul(fix16Div(hPos.y - pos.y, hMod), speed);
 	return hPos;
+}
+
+#define PI_MOD 2.84444444444
+
+#define PI_F FIX16(3.14159265358 * PI_MOD)
+#define PI_F_2 FIX16(1.57079632679 * PI_MOD)
+#define PI_F_4 FIX16(0.78539816339 * PI_MOD)
+
+fix16 arctan(fix16 x) {
+	return fix16Mul(PI_F_4, x) - fix16Mul(fix16Mul(x, (abs(x) - 1)), (FIX16(0.245) + fix16Mul(FIX16(0.066), abs(x))));
+}
+fix16 arctan2(fix16 y, fix16 x) {
+	return x >= 0 ?
+		(y >= 0 ? (y < x ? arctan(fix16Div(y, x)) : PI_F_2 - arctan(fix16Div(x, y))) : (-y < x ? arctan(fix16Div(y, x)) : -PI_F_2 - arctan(fix16Div(x, y)))) :
+		(y >= 0 ? (y < -x ? arctan(fix16Div(y, x)) + PI_F : PI_F_2 - arctan(fix16Div(x, y))) : (-y < -x ? arctan(fix16Div(y, x)) - PI_F : -PI_F_2 - arctan(fix16Div(x, y))));
+}
+s16 arcAngle;
+s16 honeAngle(fix16 x1, fix16 x2, fix16 y1, fix16 y2){
+	arcAngle = arctan2(y2 - y1, x2 - x1);
+	if(arcAngle >= 128) arcAngle -= 32;
+	if(arcAngle >= 384) arcAngle -= 32;
+	if(arcAngle < 0){
+		arcAngle = 1024 + arcAngle;
+		if(arcAngle < 896) arcAngle += 32;
+		if(arcAngle < 640) arcAngle += 32;
+	}
+	return arcAngle;
 }
 
 void bulletSfx(u8 i){

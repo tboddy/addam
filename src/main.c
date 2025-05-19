@@ -49,14 +49,14 @@ s16 gameOverClock;
 
 static void updateGame(){
 	if(!paused){
-		updatePlayer();
 		if(clock % 2 == 0){
-			updateBullets();
+			updatePlayer();
 			updateStage();
-		} else {
 			updateEnemies();
-			updateBackground();
+		} else {
+			updateBullets();
 			updateExplosions();
+			updateBackground();
 		}
 		updateChrome();
 	}

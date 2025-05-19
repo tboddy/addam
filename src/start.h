@@ -193,9 +193,9 @@ void loadStart(){
 	VDP_loadTileSet(startFade3.tileset, START_I + 2, DMA);
 	VDP_loadTileSet(startFade4.tileset, START_I + 3, DMA);
 	VDP_setScrollingMode(HSCROLL_LINE, VSCROLL_PLANE);
-	drawStartSega();
+	// drawStartSega();
 	// isLunatic = TRUE;
-	// loadGameFromStart();
+	loadGameFromStart();
 	// loadAttractFromStart();
 }
 

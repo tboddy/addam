@@ -7,7 +7,7 @@
 #define PLAYER_BOUND_Y FIX16(16 + 12)
 #define PLAYER_BOUND_H GAME_H_F - PLAYER_BOUND_Y
 
-#define PLAYER_SPEED FIX16(3)
+#define PLAYER_SPEED FIX16(6)
 #define PLAYER_SPEED_NORM fix16Mul(PLAYER_SPEED, FIX16(NORM))
 
 #define PLAYER_OFF_X 12
@@ -16,7 +16,7 @@
 
 // movement
 
-#define PLAYER_JUMP_MOD FIX16(0.2)
+#define PLAYER_JUMP_MOD FIX16(0.5)
 
 #define PLAYER_JUMP_Y_FLIP fix16Div(GAME_H_F, FIX16(2))
 #define PLAYER_JUMP_Y_LIMIT FIX16(16 + 12)
@@ -178,69 +178,46 @@ static void spawnPlayerBullet(){
 	struct bulletSpawner spawner = {
 		.x = player.pos.x,
 		.y = player.pos.y,
-		.image = &playerBullet,
-		.big = TRUE,
 		.player = TRUE,
-		.speed = FIX16(15)
+		.speed = FIX16(15),
+		.anim = 6
 	};
 	if(isAttract) attractBulletDir = random() % 3;
 	switch(player.currentWall){
 		case 0:
 			if(ctrl.up){
 				spawner.angle = 640;
-				spawner.anim = 2;
-				spawner.xFlip = TRUE;
-				spawner.yFlip = TRUE;
 			} else if(ctrl.down){
 				spawner.angle = 384;
-				spawner.anim = 2;
-				spawner.xFlip = TRUE;
 			} else {
 				spawner.angle = 512;
-				spawner.anim = 0;
-				spawner.xFlip = TRUE;
 			}
 			break;
 		case 1:
 			if((!isAttract && ctrl.left) || (isAttract && attractBulletDir == 0)){
 				spawner.angle = 640;
-				spawner.yFlip = TRUE;
-				spawner.xFlip = TRUE;
-				spawner.anim = 2;
 			} else if((!isAttract && ctrl.right) || (isAttract && attractBulletDir == 1)){
 				spawner.angle = 896;
-				spawner.anim = 2;
-				spawner.yFlip = TRUE;
 			} else {
 				spawner.angle = 768;
-				spawner.anim = 1;
-				spawner.yFlip = TRUE;
 			}
 			break;
 		case 2:
 			if(ctrl.up){
 				spawner.angle = 896;
-				spawner.anim = 2;
-				spawner.yFlip = TRUE;
 			} else if(ctrl.down){
 				spawner.angle = 128;
-				spawner.anim = 2;
 			} else {
 				spawner.angle = 0;
-				spawner.anim = 0;
 			}
 			break;
 		case 3:
 			if(ctrl.left){
 				spawner.angle = 384;
-				spawner.anim = 2;
-				spawner.xFlip = TRUE;
 			} else if(ctrl.right){
 				spawner.angle = 128;
-				spawner.anim = 2;
 			} else {
 				spawner.angle = 256;
-				spawner.anim = 1;
 			}
 			break;
 	}
@@ -252,7 +229,7 @@ static void spawnPlayerBullet(){
 	spawnBullet(spawner, updater);
 }
 
-#define SHOT_INTERVAL 16
+#define SHOT_INTERVAL 10
 s16 shotInterval;
 
 static void shotPlayer(){
@@ -298,9 +275,9 @@ static void drawPlayer(){
 		SPR_setVFlip(player.image, player.movingUp);
 	if(player.recovering){
 		if(!animatingRecovery) animatingRecovery = TRUE;
-		if(player.invincibleClock % 30 == 0){
+		if(player.invincibleClock % 10 == 0){
 			SPR_setVisibility(player.image, HIDDEN);
-		} else if(player.invincibleClock % 30 == 15) {
+		} else if(player.invincibleClock % 10 == 5) {
 			SPR_setVisibility(player.image, VISIBLE);
 		}
 	} else if(!player.recovering && animatingRecovery){

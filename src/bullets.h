@@ -2,7 +2,7 @@ s16 killBulletsClock = 0;
 
 #define BULLET_DIST_CHECK FIX32(0.5)
 #define BULLET_GRAZE_CHECK FIX32(12)
-#define BULLET_OFF 4
+#define BULLET_OFF 8
 #define BULLET_OFF_BIG 8
 #define BULLET_OFF_HUGE 16
 #define BULLET_DIST FIX32(4)
@@ -14,6 +14,60 @@ s16 killBulletsClock = 0;
 #define BULLET_BOUND_BOSS_Y FIX16(48)
 #define BULLET_BOUND_BOSS_W FIX16(320 - 16)
 #define BULLET_BOUND_BOSS_H FIX16(224 - 40)
+
+
+static void doBulletRotation(u8 i){
+	if(bullets[i].anim >= FIRST_ROTATING_BULLET){
+		bullets[i].vFlip = FALSE;
+		bullets[i].hFlip = FALSE;
+		if(bullets[i].angle < -1024) bullets[i].angle += 1024;
+		else if(bullets[i].angle >= 1024) bullets[i].angle -= 1024;
+
+		// 0 - 256
+		if(bullets[i].angle >= 1008 || bullets[i].angle < 16) bullets[i].frame = 0;
+		else if(bullets[i].angle >= 16 && bullets[i].angle < 48) bullets[i].frame = 1;
+		else if(bullets[i].angle >= 48 && bullets[i].angle < 80) bullets[i].frame = 2;
+		else if(bullets[i].angle >= 80 && bullets[i].angle < 112) bullets[i].frame = 3;
+		else if(bullets[i].angle >= 112 && bullets[i].angle < 144) bullets[i].frame = 4;
+		else if(bullets[i].angle >= 112 && bullets[i].angle < 176) bullets[i].frame = 5;
+		else if(bullets[i].angle >= 176 && bullets[i].angle < 208) bullets[i].frame = 6;
+		else if(bullets[i].angle >= 208 && bullets[i].angle < 240) bullets[i].frame = 7;
+		else if(bullets[i].angle >= 240 && bullets[i].angle < 272) bullets[i].frame = 8;
+
+		// 256 - 512
+		else if(bullets[i].angle >= 272 && bullets[i].angle < 304) { bullets[i].frame = 7; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 304 && bullets[i].angle < 336) { bullets[i].frame = 6; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 336 && bullets[i].angle < 368) { bullets[i].frame = 5; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 368 && bullets[i].angle < 400) { bullets[i].frame = 4; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 400 && bullets[i].angle < 432) { bullets[i].frame = 3; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 432 && bullets[i].angle < 464) { bullets[i].frame = 2; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 464 && bullets[i].angle < 496) { bullets[i].frame = 1; bullets[i].hFlip = TRUE; }
+		else if(bullets[i].angle >= 496 && bullets[i].angle < 528) { bullets[i].frame = 0; bullets[i].hFlip = TRUE; }
+
+		// 512 - 768
+		else if(bullets[i].angle >= 528 && bullets[i].angle < 560) { bullets[i].frame = 1; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 560 && bullets[i].angle < 592) { bullets[i].frame = 2; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 592 && bullets[i].angle < 624) { bullets[i].frame = 3; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 624 && bullets[i].angle < 656) { bullets[i].frame = 4; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 656 && bullets[i].angle < 688) { bullets[i].frame = 5; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 688 && bullets[i].angle < 720) { bullets[i].frame = 6; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 720 && bullets[i].angle < 752) { bullets[i].frame = 7; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 752 && bullets[i].angle < 784) { bullets[i].frame = 8; bullets[i].hFlip = TRUE; bullets[i].vFlip = TRUE; }
+
+		// 768 - 1024
+		else if(bullets[i].angle >= 784 && bullets[i].angle < 816) { bullets[i].frame = 7; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 816 && bullets[i].angle < 848) { bullets[i].frame = 6; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 848 && bullets[i].angle < 880) { bullets[i].frame = 5; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 880 && bullets[i].angle < 912) { bullets[i].frame = 4; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 912 && bullets[i].angle < 944) { bullets[i].frame = 3; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 944 && bullets[i].angle < 976) { bullets[i].frame = 2; bullets[i].vFlip = TRUE; }
+		else if(bullets[i].angle >= 976 && bullets[i].angle < 1008) { bullets[i].frame = 1; bullets[i].vFlip = TRUE; }
+
+		SPR_setFrame(bullets[i].image, bullets[i].frame);
+		SPR_setHFlip(bullets[i].image, bullets[i].hFlip);
+		SPR_setVFlip(bullets[i].image, bullets[i].vFlip);
+	}
+}
 
 
 // lifecycle
@@ -32,7 +86,6 @@ void spawnBullet(struct bulletSpawner spawner, void(*updater)){
 			if(bullets[i].player) playerBulletCount++;
 			bulletCount++;
 			bullets[i].clock = 0;
-			bullets[i].big = spawner.big;
 			bullets[i].huge = spawner.huge;
 			for(u8 j = 0; j < COUNT_INT; j++){
 				bullets[i].bools[j] = spawner.bools[j];
@@ -47,32 +100,34 @@ void spawnBullet(struct bulletSpawner spawner, void(*updater)){
 				bullets[i].vel.y = fix16Mul(sinFix16(spawner.angle), spawner.speed);
 			}
 			bullets[i].updater = updater;
-			bullets[i].dist = FIX32(bullets[i].player ? (BULLET_OFF_BIG + 4) : (bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)) - 2);
-			bullets[i].image = SPR_addSprite(spawner.image,
-				fix16ToInt(bullets[i].pos.x) - (bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)) + GAME_X,
-				fix16ToInt(bullets[i].pos.y) - (bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)) + GAME_Y,
-				TILE_ATTR(gameOver ? PAL1 : PAL0, 0, spawner.yFlip, spawner.xFlip));
+			bullets[i].dist = FIX32(bullets[i].player ? 12 : (spawner.anim == 0 ? 4 : 7));
+			bullets[i].image = SPR_addSprite(&bulletsSprite,
+				fix16ToInt(bullets[i].pos.x) - BULLET_OFF + GAME_X,
+				fix16ToInt(bullets[i].pos.y) - BULLET_OFF + GAME_Y,
+				TILE_ATTR(gameOver ? PAL1 : PAL0, 0, spawner.vFlip, spawner.hFlip));
 			if(spawner.anim) SPR_setAnim(bullets[i].image, spawner.anim);
 			bullets[i].anim = spawner.anim;
 			SPR_setDepth(bullets[i].image, spawner.player ? 7 : (spawner.top ? 3 : 4));
+			doBulletRotation(i);
 		}
 	}
 }
 
-void killBullet(s16 i, bool explode){
+void killBullet(u8 i, bool explode){
 	SPR_releaseSprite(bullets[i].image);
 	if(bullets[i].player) playerBulletCount--;
 	bulletCount--;
 	bullets[i].active = FALSE;
 	if(explode){
-		spawnExplosion(bullets[i].pos.x, bullets[i].pos.y, bullets[i].player ? 3 : bullets[i].anim, FALSE);
+		// spawnExplosion(bullets[i].pos.x, bullets[i].pos.y, bullets[i].player ? 3 : bullets[i].anim, FALSE);
 		// if(!isAttract) XGM_startPlayPCM(SFX_EXPLOSION_1, 15, SOUND_PCM_CH2);
 	}
 }
 
-void updateBulletVel(s16 i){
+void updateBulletVel(u8 i){
 	bullets[i].vel.x = fix16Mul(cosFix16(bullets[i].angle), bullets[i].speed);
 	bullets[i].vel.y = fix16Mul(sinFix16(bullets[i].angle), bullets[i].speed);
+	doBulletRotation(i);
 }
 
 
@@ -82,7 +137,7 @@ fix16 bulletModX = FIX16(152 * 2 + 8);
 fix16 bulletModY = FIX16(92 * 2 + 8);
 fix32 bulletDist, eBulletDist;
 
-static void collideBulletWithEnemy(s16 i){
+static void collideBulletWithEnemy(u8 i){
 	for(s16 j = 0; j < ENEMY_COUNT; j++){
 		if(enemies[j].active){
 			bulletDist = getApproximatedDistance(
@@ -98,7 +153,6 @@ static void collideBulletWithEnemy(s16 i){
 						struct bulletSpawner spawner = {
 							.x = enemies[j].pos.x,
 							.y = enemies[j].pos.y,
-							.image = &smallBullet,
 							.anim = 4
 						};
 						spawner.vel = hone(enemies[j].pos, player.pos, FIX16(2 + (random() % 2 < 1 ? 0.5 : 0)), 0);
@@ -117,16 +171,16 @@ static void collideBulletWithEnemy(s16 i){
 
 fix32 pBulletDist;
 #define PLAYER_COL_OFF FIX16(24)
-static void collideBulletWithPlayer(s16 i){
+static void collideBulletWithPlayer(u8 i){
 	if(bullets[i].pos.y >= (player.pos.y - PLAYER_COL_OFF) && bullets[i].pos.y <= (player.pos.y + PLAYER_COL_OFF) &&
 		bullets[i].pos.x >= (player.pos.x - PLAYER_COL_OFF) && bullets[i].pos.x <= (player.pos.x + PLAYER_COL_OFF)){
 		pBulletDist = getApproximatedDistance(
 			fix16ToFix32((player.pos.x - bullets[i].pos.x)),
 			fix16ToFix32((player.pos.y - bullets[i].pos.y)));
-		if(pBulletDist <= (player.flipping ? (bullets[i].dist - 3) : bullets[i].dist)){
-			player.hit = TRUE;
+		if(pBulletDist <= (player.flipping ? (bullets[i].dist - FIX32(3)) : bullets[i].dist)){
+			// player.hit = TRUE;
 			killBullets = TRUE;
-			spawnExplosion(bullets[i].pos.x, bullets[i].pos.y, bullets[i].anim, TRUE);
+			// spawnExplosion(bullets[i].pos.x, bullets[i].pos.y, bullets[i].anim, TRUE);
 		}
 	}
 }
@@ -140,7 +194,7 @@ static void collideBulletWithPlayer(s16 i){
 #define BULLET_FLIP_X_CHECK FIX16(GAME_W / 2)
 #define BULLET_FLIP_Y_CHECK FIX16(GAME_H / 2)
 
-static void reflectBullet(s16 i){
+static void reflectBullet(u8 i){
 	if(bullets[i].pos.x <= (BULLET_BOUND_X + FIX16(bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF))) ||
 		bullets[i].pos.x >= (BULLET_BOUND_W - FIX16(bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)))){
 		bullets[i].vel.x *= -1;
@@ -155,7 +209,7 @@ static void reflectBullet(s16 i){
 	}
 }
 
-static void collideBullet(s16 i){
+static void collideBullet(u8 i){
 	if(bullets[i].pos.x <= (BULLET_BOUND_X + FIX16(bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF))) ||
 		bullets[i].pos.x >= (BULLET_BOUND_W - FIX16(bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF))) ||
 		bullets[i].pos.y <= (BULLET_BOUND_Y + FIX16(bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF))) ||
@@ -172,13 +226,13 @@ static void collideBullet(s16 i){
 
 // loop
 
-static void drawBullet(s16 i){
+static void drawBullet(u8 i){
 	SPR_setPosition(bullets[i].image,
-		fix16ToInt(bullets[i].pos.x) - (bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)) + GAME_X,
-		fix16ToInt(bullets[i].pos.y) - (bullets[i].huge ? BULLET_OFF_HUGE : (bullets[i].big ? BULLET_OFF_BIG : BULLET_OFF)) + GAME_Y);
+		fix16ToInt(bullets[i].pos.x) - BULLET_OFF + GAME_X,
+		fix16ToInt(bullets[i].pos.y) - BULLET_OFF + GAME_Y);
 }
 
-static void updateBullet(s16 i){
+static void updateBullet(u8 i){
 	bullets[i].pos.x += bullets[i].vel.x;
 	bullets[i].pos.y += bullets[i].vel.y;
 	bullets[i].posTile.x = fix16ToInt(bullets[i].pos.x / 8);
