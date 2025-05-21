@@ -69,6 +69,7 @@ static void movePlayer(){
 		player.startedFlip = TRUE;
 		player.canFlip = FALSE;
 	}
+
 	if(player.flipping){
 		player.jumpSpeed += PLAYER_JUMP_MOD;
 		switch(player.currentWall){
@@ -161,6 +162,29 @@ static void movePlayer(){
 			player.pos.x >= WALL_CHECK_LEFT_BOUND &&
 			player.pos.x <= WALL_CHECK_RIGHT_BOUND){
 			changeLevels(3);
+		}
+	}
+
+	// animation check
+	if(player.clock % 30 == 0){
+
+		switch(player.currentWall){
+			case 0:
+				SPR_setHFlip(player.image, TRUE);
+				SPR_setAnim(player.image, 1);
+				break;
+			case 1:
+				SPR_setVFlip(player.image, FALSE);
+				SPR_setAnim(player.image, 0);
+				break;
+			case 2:
+				SPR_setHFlip(player.image, FALSE);
+				SPR_setAnim(player.image, 1);
+				break;
+			case 3:
+				SPR_setVFlip(player.image, TRUE);
+				SPR_setAnim(player.image, 0);
+				break;
 		}
 	}
 

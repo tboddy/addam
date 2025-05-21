@@ -271,38 +271,48 @@ static void spawnBossOne(s16 i){
 static void updateBossOne(s16 i){
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 300 < 200){
-		if(enemies[i].clock % 50 == 30 ||
-			enemies[i].clock % 50 == 35 ||
-			enemies[i].clock % 50 == 40){
-			if(enemies[i].clock % 50 == 30){
-				enemies[i].ints[0] = random() % 1024;
+		if(enemies[i].clock % 60 == 20 || enemies[i].clock % 60 == 30 || enemies[i].clock % 60 == 40){
+			if(enemies[i].clock % 60 == 20){
+				enemies[i].ints[0] == random() % 1024;
+				enemies[i].fixes[0] = enemies[i].pos.x;
+				enemies[i].fixes[1] = enemies[i].pos.y;
+			}
+			struct bulletSpawner spawner = {
+				.x = enemies[i].fixes[0],
+				.y = enemies[i].fixes[1],
+				.anim = 0,
+				.speed = FIX16(4),
+				.angle = enemies[i].ints[0]
+			};
+			void updater(u8 j){
+				if(bullets[j].clock % 3 == 0 && bullets[j].clock > 0 && bullets[j].speed >= FIX16(2.5)){
+					bullets[j].speed -= FIX16(0.5);
+					updateBulletVel(j);
+				}
+			}
+			for(u8 j = 0; j < 8; j++){
+				spawnBullet(spawner, updater);
+				spawner.angle += 128;
+			}
+		} else if(enemies[i].clock % 60 >= 50){
+			if(enemies[i].clock % 60 == 50){
+				enemies[i].fixes[0] = enemies[i].pos.x;
+				enemies[i].fixes[1] = enemies[i].pos.y;
 			}
 			struct bulletSpawner spawner = {
 				.x = enemies[i].pos.x,
 				.y = enemies[i].pos.y,
-				.anim = 0,
-				.speed = FIX16(3),
-				.angle = enemies[i].ints[0]
+				.anim = 5,
+				.speed = FIX16(2.5),
+				.angle = random() % 1024
 			};
-			void updater(s16 j){
-				if(bullets[j].clock % 5 == 0 && bullets[j].speed > 0 && !bullets[j].bools[1]){
-					bullets[j].speed -= FIX16(1);
-					if(bullets[j].speed == 0) bullets[j].bools[1] = TRUE;
-					updateBulletVel(j);
-				} else if(bullets[j].clock == 30){
-					bullets[j].speed = FIX16(3);
-					if(bullets[j].bools[0]) bullets[j].angle = honeAngle(bullets[j].pos.x, player.pos.x, bullets[j].pos.y, player.pos.y);
-					else bullets[j].angle += 512;
+			void updater(u8 j){
+				if(bullets[j].clock == 15){
+					bullets[j].angle = honeAngle(bullets[j].pos.x, player.pos.x, bullets[j].pos.y, player.pos.y);
 					updateBulletVel(j);
 				}
 			}
-			for(u8 j = 0; j < 4; j++){
-				spawner.bools[0] = j % 2 == 0;
-				spawner.anim = j % 2 == 0 ? 5 : 0;
-				spawnBullet(spawner, updater);
-				spawner.angle += 256;
-			}
-			enemies[i].ints[0] += (enemies[i].clock % 50 == 35 ? 41 : -41);
+			spawnBullet(spawner, updater);
 		}
 	} else if(enemies[i].clock % 3 == 0 && enemies[i].clock % 300 >= 220 && enemies[i].clock % 300 < 280){
 		struct bulletSpawner spawner = {

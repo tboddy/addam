@@ -2,12 +2,7 @@ enhancements
 	port all bullets (just detection distance left)
 	messaging when doors open
 	add secondary/tertiary effects to patterns
-	make boss movement a little more dynamic
 	better door textures
 
 bugs
 	when going to level after boss, stop/start music can be a race condition. run a check
-	wrong sprite orientation can still be displayed. run a check
-	boss' speed will keep on increasing if left alone. check velocity multipliers
-
-

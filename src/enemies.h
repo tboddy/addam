@@ -42,10 +42,10 @@ void spawnEnemy(u8 type){
 			case 25: spawnBossFinal(i); break;
 		}
 		if(enemies[i].boss){
-			enemies[i].speed = FIX16(0.25);
+			enemies[i].speed = FIX16(1);
 			enemies[i].pos.x = FIX16(GAME_W / 2);
 			enemies[i].pos.y = FIX16(GAME_H / 2);
-			enemies[i].angle = 256 * (random() % 4) + 128;
+			enemies[i].angle = 256 * (random() % 4) + 64;
 		}
 		SPR_setDepth(enemies[i].image, 6);
 		SPR_setAnim(enemies[i].image, enemies[i].anim);
@@ -62,14 +62,13 @@ void spawnEnemy(u8 type){
 #define ENEMY_BOUND_Y FIX16(24)
 #define ENEMY_BOUND_H GAME_H_F - ENEMY_BOUND_Y
 
-#define BOSS_BOUND_X FIX16(88)
+#define BOSS_BOUND_X FIX16(64)
 #define BOSS_BOUND_W GAME_W_F - BOSS_BOUND_X
 
-#define BOSS_BOUND_Y FIX16(96)
+#define BOSS_BOUND_Y FIX16(64)
 #define BOSS_BOUND_H GAME_H_F - BOSS_BOUND_Y
 
 // enemies[i].boss
-
 
 static void reflectEnemy(s16 i){
 	if(enemies[i].pos.x <= ((enemies[i].boss ? BOSS_BOUND_X : ENEMY_BOUND_X) + enemies[i].off.x) ||
@@ -86,6 +85,16 @@ static void collideEnemy(s16 i){
 		enemies[i].pos.y <= ((enemies[i].boss ? BOSS_BOUND_Y : ENEMY_BOUND_Y) + enemies[i].off.y) ||
 		enemies[i].pos.y >= ((enemies[i].boss ? BOSS_BOUND_H : ENEMY_BOUND_H) - enemies[i].off.y)){
 			reflectEnemy(i);
+	} else if(enemies[i].boss && enemies[i].clock > 0 && enemies[i].clock % 120 == 0){
+		if(enemies[i].bools[6]){
+			enemies[i].vel.x *= 2.0;
+			enemies[i].vel.y *= 2.0;
+			enemies[i].bools[6] = FALSE;
+		} else {
+			enemies[i].vel.x *= 0.5;
+			enemies[i].vel.y *= 0.5;
+			enemies[i].bools[6] = TRUE;
+		}
 	}
 }
 
@@ -101,16 +110,6 @@ static void drawEnemy(s16 i){
 
 static void updateEnemy(s16 i){
 	enemyCount++;
-
-	if(enemies[i].boss && enemies[i].clock > 0){
-		if(enemies[i].clock % 240 == 0){
-			enemies[i].vel.x *= 0.75;
-			enemies[i].vel.y *= 0.75;
-		} else if(enemies[i].clock % 240 == 120){
-			enemies[i].vel.x *= 1.5;
-			enemies[i].vel.y *= 1.5;
-		}
-	}
 
 	enemies[i].pos.x += enemies[i].vel.x;
 	enemies[i].pos.y += enemies[i].vel.y;
