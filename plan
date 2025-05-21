@@ -1,8 +1,4 @@
 enhancements
 	port all bullets (just detection distance left)
-	messaging when doors open
 	add secondary/tertiary effects to patterns
 	better door textures
-
-bugs
-	when going to level after boss, stop/start music can be a race condition. run a check

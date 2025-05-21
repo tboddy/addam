@@ -3,6 +3,8 @@
 #define FRAME_LEFT_I FRAME_BOTTOM_I + 40
 #define FRAME_RIGHT_I FRAME_LEFT_I + 52
 
+#define GO_1_I FRAME_RIGHT_I + 312
+#define GO_2_I GO_1_I + 4
 
 ///////////
 // frame //
@@ -17,7 +19,6 @@ static void loadFrame(){
 	VDP_fillTileMapRectInc(BG_B, TILE_ATTR_FULL(PAL1, 1, 0, 0, FRAME_LEFT_I), 0, GAME_Y_T, GAME_X_T, GAME_H_T);
 	// right
 	VDP_fillTileMapRectInc(BG_B, TILE_ATTR_FULL(PAL1, 1, 0, 0, FRAME_RIGHT_I), GAME_X_T + GAME_W_T, GAME_Y_T, WIN_W_T - GAME_W_T - GAME_X_T, GAME_H_T);
-
 
 	// // top
 	// VDP_fillTileMapRect(BG_A, TILE_ATTR_FULL(PAL1, 1, 0, 0, CHROME_I), 0, 0, WIN_W_T, 1);
@@ -265,6 +266,62 @@ void clearPause(){
 }
 
 
+// unlocking indication
+
+#define U_X_0 GAME_X_T + GAME_W_T - 1 - 3
+#define U_Y_0 GAME_Y_T + (GAME_H_T / 2) - 2
+
+#define U_X_1 GAME_X_T + (GAME_W_T / 2) - 2
+#define U_Y_1 GAME_Y_T + GAME_H_T - 1 - 3
+
+#define U_X_2 GAME_X_T + 3
+#define U_Y_2 GAME_Y_T + (GAME_H_T / 2) - 2
+
+#define U_X_3 GAME_X_T + (GAME_W_T / 2) - 2
+#define U_Y_3 GAME_Y_T + 3
+
+void showUnlocking(bool opposite){
+	for(u8 i = 0; i < 4; i++){
+		if(wallHealth[i] == 2){
+			switch(i){
+				case 0:
+					VDP_fillTileMapRectInc(BG_A, TILE_ATTR_FULL(PAL0, 1, 0, 0, GO_1_I), U_X_0, U_Y_0, 1, 4);
+					break;
+				case 1:
+					VDP_fillTileMapRectInc(BG_A, TILE_ATTR_FULL(PAL0, 1, 0, 0, GO_2_I), U_X_1, U_Y_1, 4, 1);
+					break;
+				case 2:
+					VDP_fillTileMapRectInc(BG_A, TILE_ATTR_FULL(PAL0, 1, 0, 0, GO_1_I), U_X_2, U_Y_2, 1, 4);
+					break;
+				case 3:
+					VDP_fillTileMapRectInc(BG_A, TILE_ATTR_FULL(PAL0, 1, 0, 0, GO_2_I), U_X_3, U_Y_3, 4, 1);
+					break;
+			}
+		}
+	}
+}
+void clearUnlocking(){
+	for(u8 i = 0; i < 4; i++){
+		if(wallHealth[i] == 2){
+			switch(i){
+				case 0:
+					VDP_clearTextArea(U_X_0, U_Y_0, 1, 4);
+					break;
+				case 1:
+					VDP_clearTextArea(U_X_1, U_Y_1, 4, 1);
+					break;
+				case 2:
+					VDP_clearTextArea(U_X_2, U_Y_2, 1, 4);
+					break;
+				case 3:
+					VDP_clearTextArea(U_X_3, U_Y_3, 4, 1);
+					break;
+			}
+		}
+	}
+}
+
+
 ////////////
 // extern //
 ////////////
@@ -274,6 +331,9 @@ void loadChrome(){
 	VDP_loadTileSet(chromeFrameBottom.tileset, FRAME_BOTTOM_I, DMA);
 	VDP_loadTileSet(chromeFrameLeft.tileset, FRAME_LEFT_I, DMA);
 	VDP_loadTileSet(chromeFrameRight.tileset, FRAME_RIGHT_I, DMA);
+	VDP_loadTileSet(chromeGo1.tileset, GO_1_I, DMA);
+	VDP_loadTileSet(chromeGo2.tileset, GO_2_I, DMA);
+
 	loadFrame();
 	loadHud();
 }

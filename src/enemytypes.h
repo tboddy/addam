@@ -248,11 +248,8 @@ static void updateEnemySeven(s16 i){
 }
 
 
-
-
 // lily from touhou 7
 static void spawnBossOne(s16 i){
-	// if(!isAttract) XGM_startPlay(&bgmBoss1);
 	if(isAttract) enemies[i].angle = 768 - 64;
 	enemies[i].health = 15;
 	enemies[i].off.x = 16;
@@ -269,6 +266,7 @@ static void spawnBossOne(s16 i){
 }
 
 static void updateBossOne(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss1);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 300 < 200){
 		if(enemies[i].clock % 60 == 20 || enemies[i].clock % 60 == 30 || enemies[i].clock % 60 == 40){
@@ -328,7 +326,6 @@ static void updateBossOne(s16 i){
 
 // cirno from touhou 7
 static void spawnBossTwo(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss1);
 	enemies[i].health = 20;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -343,6 +340,7 @@ static void spawnBossTwo(s16 i){
 	loadBossHud();
 }
 static void updateBossTwo(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss1);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 10 == 0 && enemies[i].clock % 90 < 70 && enemies[i].clock % 90 >= 10){
 		struct bulletSpawner spawner = {
@@ -400,7 +398,6 @@ static void updateBossTwo(s16 i){
 
 // eternity from touhou 16, normal spell
 static void spawnBossThree(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss1);
 	enemies[i].health = 25;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -415,6 +412,7 @@ static void spawnBossThree(s16 i){
 	loadBossHud();
 }
 static void updateBossThree(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss1);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 240 < 180){
 
@@ -496,7 +494,6 @@ static void updateBossThree(s16 i){
 
 // sunny from gfw, spell 1
 static void spawnBossFour(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss1);
 	enemies[i].health = 30;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -511,6 +508,7 @@ static void spawnBossFour(s16 i){
 	loadBossHud();
 }
 static void updateBossFour(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss1);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 120 >= 30 && enemies[i].clock % 2 == 0){
 		if(enemies[i].clock % 120 == 30){
@@ -541,7 +539,6 @@ static void updateBossFour(s16 i){
 
 // luna from gfw, spells 2, 3
 static void spawnBossFive(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss1);
 	enemies[i].health = 35;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -556,6 +553,7 @@ static void spawnBossFive(s16 i){
 	loadBossHud();
 }
 static void updateBossFive(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss1);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 60 >= 21 && enemies[i].clock % 3 == 0){
 		if(enemies[i].clock % 9 == 0) bulletSfx(1);
@@ -588,7 +586,6 @@ static void updateBossFive(s16 i){
 
 // star from gfw, spells 2, 3
 static void spawnBossSix(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss2);
 	enemies[i].health = 40;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -603,6 +600,7 @@ static void spawnBossSix(s16 i){
 	loadBossHud();
 }
 static void updateBossSix(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss2);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 60 >= 30 && enemies[i].clock % 60 < 34){
 		if(enemies[i].clock % 60 == 30) bulletSfx(1);
@@ -643,7 +641,6 @@ static void updateBossSix(s16 i){
 
 // clownpiece from touhou 15, non, spells 2, 3
 static void spawnBossFinal(s16 i){
-	if(!isAttract) XGM_startPlay(&bgmBoss2);
 	enemies[i].health = 45;
 	enemies[i].off.x = 16;
 	enemies[i].off.y = 16;
@@ -658,6 +655,7 @@ static void spawnBossFinal(s16 i){
 	loadBossHud();
 }
 static void updateBossFinal(s16 i){
+	if(enemies[i].clock == 1 && !isAttract) XGM_startPlay(&bgmBoss2);
 	bossHealth = enemies[i].health;
 	if(enemies[i].clock % 120 >= 30 && enemies[i].clock % 2 == 0){
 		if(enemies[i].clock % 120 == 30){

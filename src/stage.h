@@ -431,7 +431,7 @@ void loadStage(){
 
 static void stageOne(){
 	if(stageClock == 0) XGM_stopPlay();
-	else if(stageClock == 40) spawnEnemy(3);
+	else if(stageClock == 40) spawnEnemy(25);
 	// if(enemyCount < 3 && stageClock % 20 == 0 && timeLeft > 0 && stageClock > 20) spawnEnemy(1);
 }
 static void stageTwo(){
@@ -572,8 +572,9 @@ static void stageTwentyFive(){
 
 
 void updateStage(){
-	if(stageClock == 0) loadTimeHud();
-	if(!clearedRooms[currentStage]){
+	if(stageClock == 0){
+		loadTimeHud();
+	} if(!clearedRooms[currentStage]){
 		switch(currentStage){
 			// case 1: stageTwentyFive(); break;
 			case 1: stageOne(); break;
@@ -605,8 +606,14 @@ void updateStage(){
 	}
 	if(stageClock < CLOCK_LIMIT) stageClock++;
 	if(!bossActive){
-		if(timeLeft > 0 && !paused) timeLeft--;
-		else if(timeLeft <= 0 && !unlocked){
+		if(timeLeft > 0 && !paused){
+			if(timeLeft <= 110 && timeLeft % 10 == 0){
+				if(timeLeft % 20 == 10) showUnlocking();
+				else clearUnlocking();
+			}
+			timeLeft--;
+		} else if(timeLeft <= 0 && !unlocked){
+			clearUnlocking();
 			unlocked = TRUE;
 			loadWalls();
 		}

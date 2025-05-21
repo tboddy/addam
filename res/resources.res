@@ -6,6 +6,9 @@ IMAGE chromeFrameBottom "chrome/framebottom.png" NONE NONE
 IMAGE chromeFrameLeft "chrome/frameleft.png" NONE NONE
 IMAGE chromeFrameRight "chrome/frameright.png" NONE NONE
 
+IMAGE chromeGo1 "chrome/go1.png" NONE NONE
+IMAGE chromeGo2 "chrome/go2.png" NONE NONE
+
 SPRITE playerKoakuma "player/koakuma.png" 3 3 NONE 0
 SPRITE playerReimu "player/reimu.png" 3 3 NONE 0
 

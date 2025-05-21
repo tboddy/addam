@@ -16,7 +16,6 @@
 #define GAME_W_F FIX16(GAME_W)
 #define GAME_H_F FIX16(GAME_H)
 
-
 #define NORM 0.707
 
 s16 emptyI, clock, currentStage, currentLevel, timeLeft, attractClock;
